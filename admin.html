@@ -200,7 +200,7 @@ const custOverall=company=>avg(SECTIONS.map(s=>custSection(company,s.id)).filter
 const custCoverage=company=>DEPTS.filter(d=>custSection(company,d)!==null);
 const companySection=secId=>avg(CUSTOMERS.map(c=>custSection(c.company,secId)).filter(v=>v!==null));
 function questionAvg(n){const v=RESPONSES.map(r=>r.ratings[n]).filter(x=>typeof x==='number');return v.length?avg(v)/5*100:null}
-const linkUrl=l=>`${UM_CONFIG.SITE_URL}/f/${l.code}`;
+const linkUrl=l=>`${UM_CONFIG.SITE_URL}/?code=${l.code}`;
 
 /* ---------- render ---------- */
 let selected=null;

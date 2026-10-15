@@ -4,7 +4,7 @@ Two pages, one database, zero monthly cost at this volume.
 
 | What | Where | Address |
 |---|---|---|
-| Customer form | `index.html` | `https://feedback.uandm.co.in/f/<CODE>` |
+| Customer form | `index.html` | `https://feedback.uandm.co.in/?code=<CODE>` |
 | MD dashboard | `admin.html` | `https://feedback.uandm.co.in/admin` |
 | Database + login | Supabase (free tier) | — |
 | Hosting | Cloudflare Pages (free) — or Vercel | — |
