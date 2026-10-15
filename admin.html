@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#F4EDE6">
+<meta name="robots" content="noindex,nofollow">
+<title>Feedback Scorecard · U&M Designs</title>
+<link rel="icon" href="/logo.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/app.css">
+<style>
+/* admin-only additions on top of the shared identity */
+.topbar{position:sticky;top:0;animation:none}
+.header-user{display:flex;align-items:center;gap:14px;font-size:12.5px;color:var(--ink-soft)}
+.header-user button{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);padding:8px 12px;border:1px solid var(--line-strong);border-radius:8px;background:#fff}
+.header-user button:hover{border-color:var(--ink)}
+.hide{display:none!important}
+.login-wrap{min-height:calc(100vh - 86px);display:grid;place-items:center;padding:30px 20px}
+.login{width:100%;max-width:420px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:38px 36px}
+.login h1{font-size:30px;letter-spacing:-.045em;margin:10px 0 6px}
+.login p{color:var(--ink-soft);font-size:14.5px;margin-bottom:24px}
+.login label{display:block;font-size:12.5px;font-weight:700;margin:14px 0 6px}
+.login input{width:100%;padding:12px 14px;border:1px solid var(--line-strong);border-radius:10px;background:#fff;font-size:15px}
+.login .btn{width:100%;justify-content:center;margin-top:22px}
+.login .err{color:var(--bad);font-size:13.5px;margin-top:12px;display:none}
+.dash{max-width:1240px;padding:34px 28px 90px}
+.dash-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.dash-head h1{font-size:38px;letter-spacing:-.05em}
+.tabs{gap:6px;border-bottom:none;margin-bottom:26px}
+.tabs button{border:1px solid transparent;border-radius:10px;padding:10px 16px;margin:0}
+.tabs button.on{background:#fff;border-color:var(--line-strong);color:var(--ink);box-shadow:0 2px 6px rgba(43,49,57,.05)}
+.kpi,.panel,.cust,.resp{border-radius:var(--r)}
+.kpi.hero{background:var(--ink)}
+.kpi.hero .k-val{color:#FFB38A}
+.heat tr.total td{background:var(--ink)}.heat tr.total td.c{color:#FFB38A}
+.cust.on{box-shadow:inset 3px 0 0 var(--brass)}
+.quote{border-left-color:var(--brass)}
+.empty{padding:40px;text-align:center;color:var(--ink-soft)}
+.spinner{width:30px;height:30px;border:3px solid var(--line);border-top-color:var(--brass);border-radius:50%;margin:90px auto;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;opacity:0;transition:.25s;pointer-events:none;box-shadow:var(--shadow);z-index:30}
+.toast.show{opacity:1;transform:translateX(-50%)}
+/* send tab */
+.send-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+@media(max-width:960px){.send-grid{grid-template-columns:1fr}}
+.field{margin-bottom:14px}.field label{display:block;font-size:13px;font-weight:700;margin-bottom:5px}
+.field input,.field select,.toolbar select{width:100%;padding:10px 12px;border:1px solid var(--line-strong);border-radius:10px;background:#fff;font-size:14.5px}
+.toolbar select{width:auto}
+.contact-row{display:grid;grid-template-columns:1fr 1fr auto;gap:8px 10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.contact-row input{padding:9px 11px;border:1px solid var(--line-strong);border-radius:8px;background:#fff;font-size:14px}
+.contact-row .depts{grid-column:1/3}
+.depts{display:flex;gap:4px;flex-wrap:wrap}
+.depts label{font-size:12.5px;font-weight:600;border:1px solid var(--line-strong);border-radius:999px;padding:4px 11px;cursor:pointer;user-select:none;background:#fff}
+.depts label:has(input:checked){background:var(--ink);color:#fff;border-color:var(--ink)}
+.depts input{display:none}
+.x{color:var(--ink-soft);font-size:18px;padding:0 6px}.x:hover{color:var(--bad)}
+.link-row{display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.link-row b{display:block;font-size:15px}.link-row small{color:var(--ink-soft);font-size:12.5px;display:block}
+.link-row code{grid-column:1/-1;font-size:12px;color:var(--ink-soft);background:var(--paper);padding:5px 9px;border-radius:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.link-row .acts{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap}
+.status{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:999px;display:inline-block;justify-self:end;white-space:nowrap}
+.s-sent{background:var(--mid-bg);color:var(--mid)}.s-answered{background:var(--good-bg);color:var(--good)}.s-opened{background:#E8EEF7;color:#2F5A9E}
+.tracker-cust{margin-top:22px}
+.tracker-cust h4{font-size:16px;padding-bottom:6px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:baseline}
+.tracker-cust h4 small{font-weight:400;font-size:13px;color:var(--ink-soft);font-family:inherit}
+.btn.sm{padding:7px 12px;font-size:13px;border-radius:8px}
+.btn.danger{color:var(--bad);border-color:transparent;background:transparent}
+.btn.danger:hover{background:var(--bad-bg)}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><img class="brand-logo" src="/logo.png" alt="U&M Designs"><span class="brand-divider"></span><span class="brand-context">FEEDBACK SCORECARD</span></div>
+  <div class="header-user hide" id="hdr-user"><span id="who"></span><button id="signout" type="button">Sign out</button></div>
+</header>
+
+<!-- ============ LOGIN ============ -->
+<section class="login-wrap" id="login-view">
+  <form class="login" id="login-form">
+    <div class="eyebrow">MANAGEMENT ACCESS</div>
+    <h1>Sign in</h1>
+    <p>Customer feedback is confidential. Sign in with the account U&amp;M Designs has set up for you.</p>
+    <label for="email">Email</label><input id="email" type="email" autocomplete="username" required>
+    <label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password" required>
+    <button class="btn primary" type="submit" id="login-btn">Sign in <span class="arr">→</span></button>
+    <div class="err" id="login-err"></div>
+  </form>
+</section>
+
+<!-- ============ DASHBOARD ============ -->
+<section class="hide" id="dash-view">
+  <div class="dash">
+    <div class="dash-head"><div><div class="eyebrow">EXPORT CUSTOMER FEEDBACK</div><h1>Customer feedback scorecard</h1><p id="dash-sub"></p></div>
+      <div style="display:flex;gap:8px"><button class="btn ghost sm" id="refresh" type="button">Refresh</button><button class="btn ghost sm" id="export" type="button">Export CSV</button></div></div>
+    <div class="tabs" style="margin-top:22px">
+      <button class="on" data-pane="overview">Overview</button>
+      <button data-pane="customers">By customer</button>
+      <button data-pane="compare">Comparison</button>
+      <button data-pane="send">Send questionnaire</button>
+    </div>
+    <div id="loading"><div class="spinner"></div></div>
+
+    <div class="pane on" id="pane-overview">
+      <div class="kpis" id="kpis"></div>
+      <div class="grid2">
+        <div class="panel">
+          <h3>Section scores</h3>
+          <p class="sub">Each section is rated only by the contacts who deal with that department. The line marks the 70% target.</p>
+          <div class="bars" id="section-bars"></div>
+          <div class="legend"><span class="lg">70%+ strong</span><span class="lm">55–69% watch</span><span class="lb">below 55% act now</span><span class="lt">target</span></div>
+        </div>
+        <div class="panel">
+          <h3>Where to focus</h3><p class="sub">Lowest-scoring questions across all responses.</p>
+          <div class="focus-list" id="focus"></div>
+          <h3 style="margin-top:24px">What customers said</h3><p class="sub">Most recent "improve immediately" answers.</p>
+          <div class="quotes" id="quotes"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pane" id="pane-customers"><div class="cust-layout"><div class="cust-list" id="cust-list"></div><div class="panel" id="cust-detail"></div></div></div>
+
+    <div class="pane" id="pane-compare">
+      <div class="panel">
+        <div class="toolbar"><span>Sort by</span>
+          <select id="sort-by"><option value="overall">Overall score</option><option value="A">CRM</option><option value="B">Merchandising</option><option value="C">Product Development</option><option value="D">Quality</option><option value="E">Overall Experience</option><option value="cov">Coverage</option></select>
+        </div>
+        <div class="heat-wrap"><table class="heat" id="heat"></table></div>
+      </div>
+    </div>
+
+    <div class="pane" id="pane-send">
+      <div class="send-grid">
+        <div class="panel send">
+          <h3>Create links for a customer</h3>
+          <p class="sub">One link per contact. Each person only sees the sections for the U&amp;M departments they work with, plus Overall Experience.</p>
+          <div class="field"><label>Customer</label><select id="s-cust"></select></div>
+          <div id="s-new" class="hide"><div class="field"><label>Company name</label><input id="s-company"></div><div class="field"><label>Country</label><input id="s-country"></div></div>
+          <div class="field"><label>Contacts and the U&amp;M departments they deal with</label></div>
+          <div id="contacts"></div>
+          <div style="margin:12px 0 18px"><button class="btn ghost sm" id="add-contact" type="button">+ Add another contact</button></div>
+          <button class="btn primary" id="gen" type="button">Generate links</button>
+        </div>
+        <div class="panel">
+          <h3>Links sent</h3>
+          <p class="sub">Copy a link, or open a ready-written email from your own mailbox. Status updates as contacts open and submit.</p>
+          <div id="tracker"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="/config.js"></script>
+<script src="/questionnaire.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+const sb=window.supabase.createClient(UM_CONFIG.SUPABASE_URL,UM_CONFIG.SUPABASE_ANON_KEY);
+const $=id=>document.getElementById(id);
+
+/* ---------- auth ---------- */
+$('login-form').onsubmit=async e=>{
+  e.preventDefault();const b=$('login-btn');b.disabled=true;$('login-err').style.display='none';
+  const {error}=await sb.auth.signInWithPassword({email:$('email').value.trim(),password:$('pw').value});
+  b.disabled=false;
+  if(error){$('login-err').textContent='Sign-in failed: '+error.message;$('login-err').style.display='block'}
+};
+$('signout').onclick=()=>sb.auth.signOut();
+sb.auth.onAuthStateChange((_e,session)=>{
+  const inn=!!session;
+  $('login-view').classList.toggle('hide',inn);$('dash-view').classList.toggle('hide',!inn);$('hdr-user').classList.toggle('hide',!inn);
+  if(inn){$('who').textContent=session.user.email;loadAll()}
+});
+
+/* ---------- data ---------- */
+let CUSTOMERS=[],LINKS=[],RESPONSES=[];
+async function loadAll(){
+  $('loading').classList.remove('hide');
+  const [c,l]=await Promise.all([
+    sb.from('customers').select('*').order('company'),
+    sb.from('link_overview').select('*').order('created_at',{ascending:false})
+  ]);
+  if(c.error||l.error){toast('Could not load data: '+(c.error||l.error).message);$('loading').classList.add('hide');return}
+  CUSTOMERS=c.data;
+  LINKS=l.data.map(r=>({id:r.id,code:r.code,company:r.company,country:r.country,customer_id:r.customer_id,contact:r.contact,email:r.email,depts:r.depts,sent:r.created_at,opened:r.opened_at,answered:!!r.answered_at}));
+  RESPONSES=l.data.filter(r=>r.ratings).map(r=>({linkId:r.id,company:r.company,country:r.country,contact:r.contact,depts:r.depts,date:r.submitted_at,ratings:r.ratings,remarks:r.remarks||{},open:r.open_answers||{}}));
+  $('loading').classList.add('hide');
+  renderDash();
+}
+$('refresh').onclick=loadAll;
+
+/* ---------- scoring ---------- */
+function respSection(r,secId){const vals=SEC[secId].qs.map(([n])=>r.ratings[n]).filter(v=>typeof v==='number');return vals.length?avg(vals)/5*100:null}
+const custResponses=company=>RESPONSES.filter(r=>r.company===company);
+const custSection=(company,secId)=>avg(custResponses(company).map(r=>respSection(r,secId)).filter(v=>v!==null));
+const custOverall=company=>avg(SECTIONS.map(s=>custSection(company,s.id)).filter(v=>v!==null));
+const custCoverage=company=>DEPTS.filter(d=>custSection(company,d)!==null);
+const companySection=secId=>avg(CUSTOMERS.map(c=>custSection(c.company,secId)).filter(v=>v!==null));
+function questionAvg(n){const v=RESPONSES.map(r=>r.ratings[n]).filter(x=>typeof x==='number');return v.length?avg(v)/5*100:null}
+const linkUrl=l=>`${UM_CONFIG.SITE_URL}/f/${l.code}`;
+
+/* ---------- render ---------- */
+let selected=null;
+function renderDash(){
+  const scored=CUSTOMERS.filter(c=>custOverall(c.company)!==null);
+  const overall=avg(scored.map(c=>custOverall(c.company)));
+  const answered=LINKS.filter(l=>l.answered).length;
+  $('dash-sub').textContent=`${CUSTOMERS.length} customers · ${answered} of ${LINKS.length} contacts have responded`;
+  if(!RESPONSES.length){
+    $('kpis').innerHTML=`<div class="kpi hero" style="grid-column:1/-1"><div class="k-label">No responses yet</div><div class="k-val" style="font-size:22px;color:#fff">Create the first links under "Send questionnaire"</div><div class="k-sub">${LINKS.length?LINKS.length+' link'+(LINKS.length>1?'s':'')+' sent, waiting for replies':'Nothing sent yet'}</div></div>`;
+    $('section-bars').innerHTML='<p class="empty">Scores appear here after the first response.</p>';$('focus').innerHTML='';$('quotes').innerHTML='';
+  } else {
+    const secScores=SECTIONS.map(s=>({s,v:companySection(s.id)})).filter(x=>x.v!==null);
+    const best=[...secScores].sort((a,b)=>b.v-a.v)[0];const worst=[...secScores].sort((a,b)=>a.v-b.v)[0];
+    $('kpis').innerHTML=`
+     <div class="kpi hero"><div class="k-label">Overall score, all customers</div><div class="k-val">${pct(overall)}<small>/ 100</small></div><div class="k-sub">Average of each customer's rated sections</div></div>
+     <div class="kpi"><div class="k-label">Responses</div><div class="k-val">${answered}<small>of ${LINKS.length} sent</small></div><div class="k-sub">${LINKS.length-answered} still to chase</div></div>
+     <div class="kpi"><div class="k-label">Strongest section</div><div class="k-val t-${band(best.v)}">${pct(best.v)}<small>${best.s.name}</small></div><div class="k-sub">Keep doing this</div></div>
+     <div class="kpi"><div class="k-label">Weakest section</div><div class="k-val t-${band(worst.v)}">${pct(worst.v)}<small>${worst.s.name}</small></div><div class="k-sub">Priority for the next quarter</div></div>`;
+    $('section-bars').innerHTML=SECTIONS.map(s=>{const v=companySection(s.id);const n=RESPONSES.filter(r=>respSection(r,s.id)!==null).length;return`
+     <div class="bar-row"><div class="name">${s.name}<small>${n} respondent${n===1?'':'s'}</small></div><div class="track"><i class="c-${v===null?'':band(v)}" style="width:${v||0}%"></i></div><div class="pct ${v===null?'t-none':'t-'+band(v)}">${v===null?'–':pct(v)}</div></div>`}).join('');
+    const qs=SECTIONS.flatMap(s=>s.qs.map(([num,t])=>({num,t,sec:s.name,v:questionAvg(num)}))).filter(q=>q.v!==null).sort((a,b)=>a.v-b.v).slice(0,3);
+    $('focus').innerHTML=qs.map(q=>`<div class="focus ${band(q.v)==='bad'?'warn':band(q.v)==='mid'?'mid':''}"><div class="fs t-${band(q.v)}">${pct(q.v)}</div><div class="ft"><b>Q${q.num} · ${q.sec}</b>${q.t}<br><small>${band(q.v)==='bad'?'Below 55% — needs action':band(q.v)==='mid'?'Below target':'On target'}</small></div></div>`).join('');
+    $('quotes').innerHTML=RESPONSES.filter(r=>r.open.f1).slice(0,3).map(r=>`<div class="quote">${esc(r.open.f1)}<small>${esc(r.contact)}, ${esc(r.company)}</small></div>`).join('')||'<p class="sub">No comments yet.</p>';
+  }
+  renderCustomers();renderHeat();renderSend();
+}
+function renderCustomers(){
+  if(!CUSTOMERS.length){$('cust-list').innerHTML='';$('cust-detail').innerHTML='<p class="empty">Add a customer under "Send questionnaire".</p>';return}
+  if(!selected||!CUSTOMERS.find(c=>c.company===selected))selected=CUSTOMERS[0].company;
+  $('cust-list').innerHTML=CUSTOMERS.map(c=>{const o=custOverall(c.company);const cov=custCoverage(c.company);return`
+   <button class="cust ${c.company===selected?'on':''}" data-c="${esc(c.company)}"><span><b>${esc(c.company)}</b><small>${esc(c.country)} · ${cov.length} of 4 departments</small></span><span class="cs ${o===null?'t-none':'t-'+band(o)}">${o===null?'–':pct(o)}</span></button>`}).join('');
+  document.querySelectorAll('.cust').forEach(b=>b.onclick=()=>{selected=b.dataset.c;renderCustomers()});
+  const c=CUSTOMERS.find(x=>x.company===selected);const o=custOverall(c.company);const rs=custResponses(c.company);const ls=LINKS.filter(l=>l.company===c.company);
+  $('cust-detail').innerHTML=`
+   <div class="detail-head"><div><h3>${esc(c.company)}</h3><div class="meta">${esc(c.country)} · ${rs.length} of ${ls.length} contacts responded</div></div>
+   <div class="big-score"><div class="n ${o===null?'t-none':'t-'+band(o)}">${o===null?'–':pct(o)}</div><div class="l">overall score</div></div></div>
+   <div class="coverage">${DEPTS.map(d=>{const v=custSection(c.company,d);const l=ls.find(x=>x.depts.includes(d));return`<span class="${v!==null?'yes':'no'}">${SEC[d].name}: ${v!==null?'answered':l?'awaiting '+esc(l.contact.split(' ')[0]):'no contact'}</span>`}).join('')}</div>
+   <div class="bars">${SECTIONS.map(s=>{const v=custSection(c.company,s.id);return`<div class="bar-row"><div class="name">${s.name}${s.id==='E'?'<small>avg of all respondents</small>':''}</div><div class="track"><i class="c-${v===null?'':band(v)}" style="width:${v||0}%"></i></div><div class="pct ${v===null?'t-none':'t-'+band(v)}">${v===null?'–':pct(v)}</div></div>`}).join('')}</div>
+   ${rs.length?`<h3 style="margin-top:26px">Overall Experience by respondent</h3><p class="sub">Everyone answers this section, so a gap between contacts is a signal on its own.</p>
+   <div class="bars">${rs.map(r=>{const v=respSection(r,'E');return v===null?'':`<div class="bar-row"><div class="name">${esc(r.contact)}<small>${esc(deptNames(r.depts))} contact</small></div><div class="track"><i class="c-${band(v)}" style="width:${v}%"></i></div><div class="pct t-${band(v)}">${pct(v)}</div></div>`}).join('')}</div>`:''}
+   <h3 style="margin-top:26px">Responses</h3><p class="sub">Click a respondent to see every rating and remark.</p>
+   ${rs.map((r,i)=>`<div class="resp"><div class="resp-head" data-i="${i}"><div><b>${esc(r.contact)}</b><small>${esc(deptNames(r.depts))} contact · ${fmtDate(r.date)}</small></div><div class="scores">${[...r.depts,'E'].map(d=>{const v=respSection(r,d);return`<span>${SEC[d].name}<b class="${v===null?'t-none':'t-'+band(v)}">${v===null?'–':pct(v)}</b></span>`}).join('')}</div></div>
+    <div class="resp-body">${[...r.depts,'E'].map(d=>{const sv=respSection(r,d);return`<div class="sec-group"><div class="sg-head"><h4>${d}. ${SEC[d].name}</h4>${sv===null?'':`<span class="pill p-${band(sv)}">${pct(sv)}%</span>`}</div>
+     <table class="qtable"><tr><th style="width:36px">No.</th><th>Question</th><th style="text-align:center">Rating</th><th>Remark</th></tr>${SEC[d].qs.map(([n,t])=>{const val=r.ratings[n];return`<tr><td>${n}</td><td>${t}</td><td class="rt ${typeof val==='number'?'t-'+band(val/5*100):''}">${val===undefined?'–':val}</td><td class="rm">${esc(r.remarks[n]||'')}</td></tr>`}).join('')}</table></div>`}).join('')}
+     ${Object.values(r.open).some(x=>x)?`<div class="open-ans"><h4 style="font-size:16px;margin-bottom:4px">For the Managing Director</h4>${OPEN.filter(([k])=>r.open[k]).map(([k,t])=>`<div class="oa"><b>${t}</b><p>${esc(r.open[k])}</p></div>`).join('')}</div>`:''}
+    </div></div>`).join('')||'<p class="sub">No responses yet from this customer.</p>'}`;
+  document.querySelectorAll('.resp-head').forEach(h=>h.onclick=()=>h.parentElement.classList.toggle('open'));
+}
+function renderHeat(){
+  const sortBy=$('sort-by').value;
+  const rows=CUSTOMERS.map(c=>({c,o:custOverall(c.company),cov:custCoverage(c.company).length,s:Object.fromEntries(SECTIONS.map(sec=>[sec.id,custSection(c.company,sec.id)]))}));
+  rows.sort((a,b)=>sortBy==='overall'?(b.o??-1)-(a.o??-1):sortBy==='cov'?b.cov-a.cov:(b.s[sortBy]??-1)-(a.s[sortBy]??-1));
+  const cell=v=>v===null?`<td class="c none">not asked</td>`:`<td class="c ${band(v)[0]}">${pct(v)}</td>`;
+  const allO=avg(rows.map(r=>r.o).filter(v=>v!==null));
+  $('heat').innerHTML=`
+   <tr><th>Customer</th>${SECTIONS.map(s=>`<th class="c">${s.name}</th>`).join('')}<th class="c">Overall</th><th class="c">Coverage</th></tr>
+   ${rows.map(({c,o,cov,s})=>`<tr><td>${esc(c.company)}<small>${esc(c.country)}</small></td>${SECTIONS.map(sec=>cell(s[sec.id])).join('')}${cell(o)}<td class="cov">${cov} of 4</td></tr>`).join('')||'<tr><td colspan="8" class="empty">No customers yet.</td></tr>'}
+   ${rows.length?`<tr class="total"><td>All customers<small>${RESPONSES.length} responses</small></td>${SECTIONS.map(sec=>{const v=companySection(sec.id);return`<td class="c">${v===null?'–':pct(v)}</td>`}).join('')}<td class="c">${allO===null?'–':pct(allO)}</td><td class="cov"></td></tr>`:''}`;
+}
+$('sort-by').onchange=renderHeat;
+
+/* ---------- send ---------- */
+let contactRows=[{name:'',email:'',depts:[]}];
+function renderSend(){
+  const sel=$('s-cust');const cur=sel.value;
+  sel.innerHTML=CUSTOMERS.map(c=>`<option value="${esc(c.id)}">${esc(c.company)} — ${esc(c.country)}</option>`).join('')+`<option value="__new">+ New customer…</option>`;
+  if(cur&&[...sel.options].some(o=>o.value===cur))sel.value=cur;else if(!CUSTOMERS.length)sel.value='__new';
+  $('s-new').classList.toggle('hide',sel.value!=='__new');
+  renderContacts();renderTracker();
+}
+function renderContacts(){
+  $('contacts').innerHTML=contactRows.map((r,i)=>`
+   <div class="contact-row"><input placeholder="Contact name" value="${esc(r.name)}" data-f="name" data-i="${i}"><input placeholder="Email" type="email" value="${esc(r.email)}" data-f="email" data-i="${i}">
+   <div class="depts">${DEPTS.map(d=>`<label><input type="checkbox" data-d="${d}" data-i="${i}" ${r.depts.includes(d)?'checked':''}>${SEC[d].name}</label>`).join('')}</div>
+   <button class="x" data-rm="${i}" title="Remove" type="button">×</button></div>`).join('');
+  document.querySelectorAll('[data-f]').forEach(el=>el.oninput=()=>contactRows[+el.dataset.i][el.dataset.f]=el.value);
+  document.querySelectorAll('[data-d]').forEach(el=>el.onchange=()=>{const r=contactRows[+el.dataset.i];r.depts=el.checked?[...r.depts,el.dataset.d]:r.depts.filter(x=>x!==el.dataset.d)});
+  document.querySelectorAll('[data-rm]').forEach(el=>el.onclick=()=>{contactRows.splice(+el.dataset.rm,1);if(!contactRows.length)contactRows.push({name:'',email:'',depts:[]});renderContacts()});
+}
+$('add-contact').onclick=()=>{contactRows.push({name:'',email:'',depts:[]});renderContacts()};
+$('s-cust').onchange=()=>$('s-new').classList.toggle('hide',$('s-cust').value!=='__new');
+$('gen').onclick=async()=>{
+  const b=$('gen');let customer_id=$('s-cust').value;
+  const valid=contactRows.filter(r=>r.name.trim()&&r.depts.length);
+  if(!valid.length)return toast('Add at least one contact with a name and a department');
+  b.disabled=true;
+  if(customer_id==='__new'){
+    const company=$('s-company').value.trim(),country=$('s-country').value.trim();
+    if(!company){b.disabled=false;return toast('Enter the company name first')}
+    const {data,error}=await sb.from('customers').upsert({company,country},{onConflict:'company'}).select().single();
+    if(error){b.disabled=false;return toast('Could not save customer: '+error.message)}
+    customer_id=data.id;
+  }
+  const rows=valid.map(r=>({customer_id,contact:r.name.trim(),email:r.email.trim(),depts:[...r.depts].sort()}));
+  const {error}=await sb.from('links').insert(rows);
+  b.disabled=false;
+  if(error)return toast('Could not create links: '+error.message);
+  contactRows=[{name:'',email:'',depts:[]}];$('s-company').value='';$('s-country').value='';
+  await loadAll();$('s-cust').value=customer_id;$('s-new').classList.add('hide');
+  toast(`${rows.length} link${rows.length>1?'s':''} created — ready to send`);
+};
+function mailto(l){
+  const subj=encodeURIComponent('A quick word on your experience with U&M Designs');
+  const body=encodeURIComponent(`Dear ${l.contact.split(' ')[0]},\n\nThank you for your continued partnership with U&M Designs. I would value your candid feedback on your recent work with our ${deptNames(l.depts)} team. It takes about three minutes and comes directly to me.\n\n${linkUrl(l)}\n\nYour reply is confidential and reviewed by me personally.\n\nWarm regards,\nManaging Director\nU&M Designs`);
+  return `mailto:${encodeURIComponent(l.email)}?subject=${subj}&body=${body}`;
+}
+function renderTracker(){
+  if(!LINKS.length){$('tracker').innerHTML='<p class="empty">No links yet. Create the first ones on the left.</p>';return}
+  const byC=new Map();LINKS.forEach(l=>{if(!byC.has(l.company))byC.set(l.company,[]);byC.get(l.company).push(l)});
+  $('tracker').innerHTML=[...byC.entries()].map(([company,ls])=>`
+   <div class="tracker-cust"><h4>${esc(company)}<small>${ls.filter(l=>l.answered).length} of ${ls.length} answered</small></h4>
+   ${ls.map(l=>`<div class="link-row"><div><b>${esc(l.contact)}</b><small>${esc(l.email||'no email')} · ${esc(deptNames(l.depts))} + Overall</small></div>
+    <span class="status ${l.answered?'s-answered':l.opened?'s-opened':'s-sent'}">${l.answered?'Answered':l.opened?'Opened '+fmtDate(l.opened):'Created '+fmtDate(l.sent)}</span>
+    <code title="${esc(linkUrl(l))}">${esc(linkUrl(l))}</code>
+    <div class="acts">${l.answered?'':`<button class="btn ghost sm" data-copy="${l.id}" type="button">Copy link</button><a class="btn ghost sm" href="${mailto(l)}">Email</a><a class="btn ghost sm" href="${linkUrl(l)}" target="_blank" rel="noopener">Preview</a><button class="btn sm danger" data-del="${l.id}" type="button">Remove</button>`}</div></div>`).join('')}</div>`).join('');
+  document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=async()=>{const l=LINKS.find(x=>x.id===b.dataset.copy);try{await navigator.clipboard.writeText(linkUrl(l));toast('Link copied')}catch(e){prompt('Copy this link:',linkUrl(l))}});
+  document.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{const l=LINKS.find(x=>x.id===b.dataset.del);if(!confirm(`Remove the link for ${l.contact}? It will stop working.`))return;const {error}=await sb.from('links').delete().eq('id',l.id);if(error)return toast(error.message);loadAll()});
+}
+
+/* ---------- export ---------- */
+$('export').onclick=()=>{
+  const head=['Company','Country','Contact','Departments','Submitted',...SECTIONS.flatMap(s=>s.qs.map(([n])=>'Q'+n)),...SECTIONS.map(s=>s.name+' %'),'Overall %',...OPEN.map(([k,t])=>t)];
+  const rows=RESPONSES.map(r=>{const secs=SECTIONS.map(s=>respSection(r,s.id));const o=avg(secs.filter(v=>v!==null));
+    return [r.company,r.country,r.contact,deptNames(r.depts),fmtDate(r.date),...SECTIONS.flatMap(s=>s.qs.map(([n])=>r.ratings[n]??'')),...secs.map(v=>v===null?'':pct(v)),o===null?'':pct(o),...OPEN.map(([k])=>r.open[k]||'')]});
+  const csv=[head,...rows].map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv'}));a.download=`um-feedback-${new Date().toISOString().slice(0,10)}.csv`;a.click();
+};
+
+/* ---------- chrome ---------- */
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b));document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('on',p.id==='pane-'+b.dataset.pane))});
+</script>
+</body>
+</html>
