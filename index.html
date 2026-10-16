@@ -149,7 +149,7 @@ function renderIntro(){
     <div class="welcome-visual"><div class="welcome-mark">UPHOLSTERY & MORE</div>
       <svg class="craft-lines" viewBox="0 0 320 330" fill="none" aria-hidden="true"><path d="M103 198 V124 C103 72 137 52 201 57 C260 61 271 88 271 130 V204 M106 198 Q115 161 136 150 Q179 139 242 153 Q262 167 272 198 M93 199 Q102 181 117 179 M277 198 Q281 179 293 181 M103 201 C143 211 236 211 271 201 L266 236 C223 249 149 248 107 236 Z M124 243 L118 286 M253 243 L257 285 M117 286 L133 286 M242 285 L264 285 M109 123 C110 85 142 72 197 75"/></svg>
       <p class="visual-quote">Better partnerships begin with <strong>listening.</strong></p>
-      <div class="visual-lower"><span>Prepared for<br><b>${esc(link.company)}</b><br>${esc(link.contact)}</span><span>${flow.map(d=>esc(SEC[d].name)).join('<br>')}</span></div>
+      <div class="visual-lower"><span>Prepared for<br><b>${esc(link.company)}</b>${link.country?" · "+esc(link.country):""}<br>${esc(link.contact)}</span><span>${flow.map(d=>esc(SEC[d].name)).join('<br>')}</span></div>
     </div>
   </div>`;
   document.getElementById('next').onclick=()=>{stepIdx=1;saveDraft();renderStep();scrollTop()};

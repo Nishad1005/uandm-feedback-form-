@@ -57,13 +57,20 @@ If you prefer Vercel: `vercel.com` → Add New Project → upload the folder. `v
 
 To update the site later (a wording change, say), repeat the upload — it replaces the previous version; the data is in Supabase and untouched.
 
+## 3b. Load the contact book — 3 min
+
+Supabase → SQL Editor → New query → paste `supabase/migration-002-contacts.sql` → Run.
+Then a second query: paste `supabase/seed-contacts.sql` → Run. That loads the 220 contacts / 62 companies from the All_contact_List sheet (duplicates within a company already merged).
+
+Later lists are imported from the dashboard itself: Send questionnaire → **Import contacts (Excel / CSV)**. Same column headings as the sheet (Name, Company Name, Contact Number, Status, Location; an Email column is picked up if present).
+
 ## 4. Hand over to the MD — 5 min
 
 Send him:
 - the dashboard address (`…/admin`) and his login
 - this routine:
-  1. **Send questionnaire** tab → pick the customer (or add a new one) → enter each contact's name, email and tick the U&M department(s) they deal with → **Generate links**
-  2. For each contact click **Email** — his own mail program opens with the link and a note from him already written; he edits if he likes and sends
+  1. **Send questionnaire** tab → type any part of a name, company, phone, role or city → tick the people (or **Add all** for a company). Departments are pre-ticked from their role (MERCHANDISING → Merchandising, QA → Quality, TECH/CAD → Product Development, OWNER → CRM); adjust, add a phone or email if missing → **Generate links**
+  2. For each link click **WhatsApp** or **Email** — his own WhatsApp / mail program opens with the note and link already written; he edits if he likes and sends. If a contact has no number, WhatsApp opens its chat picker so he chooses the person.
   3. The status next to each link moves from *Created* → *Opened* → *Answered* on its own
   4. Scores appear under **Overview**, **By customer** and **Comparison** as responses arrive; **Export CSV** gives the raw data for Excel
 

@@ -69,6 +69,44 @@
 .btn.sm{padding:7px 12px;font-size:13px;border-radius:8px}
 .btn.danger{color:var(--bad);border-color:transparent;background:transparent}
 .btn.danger:hover{background:var(--bad-bg)}
+
+/* send tab v2: search + pick */
+.search{position:relative;margin-bottom:14px}
+.search input{width:100%;padding:12px 14px 12px 40px;border:1px solid var(--line-strong);border-radius:10px;background:#fff;font-size:15px}
+.search svg{position:absolute;left:13px;top:13px;width:18px;height:18px;stroke:var(--ink-soft);fill:none;stroke-width:2}
+.results{max-height:380px;overflow:auto;border:1px solid var(--line);border-radius:10px;background:#fff}
+.res-co{padding:9px 14px 4px;font-size:12px;font-weight:800;letter-spacing:.06em;color:var(--ink-soft);display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--paper);position:sticky;top:0}
+.res-co .add-all{font-size:11.5px;font-weight:700;color:var(--brass);letter-spacing:0}
+.res-row{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:8px 14px;border-bottom:1px solid var(--line);font-size:14px;cursor:pointer}
+.res-row:hover{background:#FFF8F3}
+.res-row.in{opacity:.45}
+.res-row b{display:block}.res-row small{color:var(--ink-soft);font-size:12.5px}
+.res-row .tag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--brass-soft);color:var(--wood);white-space:nowrap}
+.res-row .tag.none{background:#EEE;color:#888}
+.picked{margin-top:18px}
+.picked h4{font-size:15px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:baseline}
+.picked h4 small{font-size:12.5px;color:var(--ink-soft);font-family:inherit;font-weight:400}
+.pick-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px 10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.pick-row .who{grid-column:1/4;font-size:14.5px}.pick-row .who b{margin-right:6px}.pick-row .who small{color:var(--ink-soft)}
+.pick-row input{padding:8px 10px;border:1px solid var(--line-strong);border-radius:8px;background:#fff;font-size:13.5px;min-width:0}
+.pick-row .depts{grid-column:1/4}
+.pick-row .x{grid-row:1;grid-column:4}
+.empty-sm{padding:18px;text-align:center;color:var(--ink-soft);font-size:13.5px}
+.dupes{margin-top:18px;padding:12px 14px;border:1px dashed var(--line-strong);border-radius:10px;font-size:13.5px}
+.dupes b{display:block;margin-bottom:6px}
+.dupes .d{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:6px 0;border-top:1px solid var(--line)}
+.btn.wa{background:#25D366;color:#fff;border-color:#25D366}.btn.wa:hover{background:#1EBE5A}
+.modal-bg{position:fixed;inset:0;background:rgba(43,49,57,.45);display:grid;place-items:center;z-index:40;padding:20px}
+.modal{background:var(--card);border-radius:var(--r);max-width:560px;width:100%;padding:28px;box-shadow:var(--shadow);max-height:90vh;overflow:auto}
+.modal h3{margin-bottom:6px}.modal .sub{margin-bottom:14px}
+.modal table{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0 16px}
+.modal td{padding:6px 4px;border-bottom:1px solid var(--line)}.modal td:last-child{text-align:right;font-weight:700}
+.modal .acts{display:flex;gap:8px;justify-content:flex-end}
+.mini{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px;margin-top:10px}
+.mini input,.mini select{padding:9px 11px;border:1px solid var(--line-strong);border-radius:8px;background:#fff;font-size:14px;width:100%}
+.mini .full{grid-column:1/-1}
+details.adder{margin-top:14px}
+details.adder summary{cursor:pointer;font-weight:600;font-size:14px;color:var(--brass)}
 </style>
 </head>
 <body>
@@ -135,18 +173,28 @@
     <div class="pane" id="pane-send">
       <div class="send-grid">
         <div class="panel send">
-          <h3>Create links for a customer</h3>
-          <p class="sub">One link per contact. Each person only sees the sections for the U&amp;M departments they work with, plus Overall Experience.</p>
-          <div class="field"><label>Customer</label><select id="s-cust"></select></div>
-          <div id="s-new" class="hide"><div class="field"><label>Company name</label><input id="s-company"></div><div class="field"><label>Country</label><input id="s-country"></div></div>
-          <div class="field"><label>Contacts and the U&amp;M departments they deal with</label></div>
-          <div id="contacts"></div>
-          <div style="margin:12px 0 18px"><button class="btn ghost sm" id="add-contact" type="button">+ Add another contact</button></div>
-          <button class="btn primary" id="gen" type="button">Generate links</button>
+          <h3>Who should receive the questionnaire?</h3>
+          <p class="sub">Search by name, company, phone, role or location. Tick the people, check their departments, generate.</p>
+          <div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="q" placeholder="e.g. Cinnamon, Amit, 98100, QA, Delhi" autocomplete="off"></div>
+          <div class="results" id="results"></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+            <button class="btn ghost sm" id="import-btn" type="button">Import contacts (Excel / CSV)</button>
+            <input type="file" id="import-file" accept=".xlsx,.xls,.csv" class="hide">
+          </div>
+          <details class="adder"><summary>+ Add a contact by hand</summary>
+            <div class="mini">
+              <select id="a-cust"></select><input id="a-company" placeholder="New company name" class="hide">
+              <input id="a-name" placeholder="Contact name"><input id="a-phone" placeholder="Phone (WhatsApp)">
+              <input id="a-email" placeholder="Email"><input id="a-status" placeholder="Role, e.g. MERCHANDISING">
+              <input id="a-location" placeholder="Location"><button class="btn ghost sm" id="a-save" type="button">Save contact</button>
+            </div>
+          </details>
+          <div class="picked" id="picked"></div>
+          <div id="dupes"></div>
         </div>
         <div class="panel">
           <h3>Links sent</h3>
-          <p class="sub">Copy a link, or open a ready-written email from your own mailbox. Status updates as contacts open and submit.</p>
+          <p class="sub">Copy a link, or send it from your own Email or WhatsApp with the message already written. Status updates as contacts open and submit.</p>
           <div id="tracker"></div>
         </div>
       </div>
@@ -185,7 +233,8 @@ async function loadAll(){
   ]);
   if(c.error||l.error){toast('Could not load data: '+(c.error||l.error).message);$('loading').classList.add('hide');return}
   CUSTOMERS=c.data;
-  LINKS=l.data.map(r=>({id:r.id,code:r.code,company:r.company,country:r.country,customer_id:r.customer_id,contact:r.contact,email:r.email,depts:r.depts,sent:r.created_at,opened:r.opened_at,answered:!!r.answered_at}));
+  LINKS=l.data.map(r=>({id:r.id,code:r.code,company:r.company,country:r.country,customer_id:r.customer_id,contact:r.contact,email:r.email,phone:r.phone||'',depts:r.depts,sent:r.created_at,opened:r.opened_at,answered:!!r.answered_at}));
+  await loadContacts();
   RESPONSES=l.data.filter(r=>r.ratings).map(r=>({linkId:r.id,company:r.company,country:r.country,contact:r.contact,depts:r.depts,date:r.submitted_at,ratings:r.ratings,remarks:r.remarks||{},open:r.open_answers||{}}));
   $('loading').classList.add('hide');
   renderDash();
@@ -263,60 +312,189 @@ function renderHeat(){
 }
 $('sort-by').onchange=renderHeat;
 
-/* ---------- send ---------- */
-let contactRows=[{name:'',email:'',depts:[]}];
-function renderSend(){
-  const sel=$('s-cust');const cur=sel.value;
-  sel.innerHTML=CUSTOMERS.map(c=>`<option value="${esc(c.id)}">${esc(c.company)} — ${esc(c.country)}</option>`).join('')+`<option value="__new">+ New customer…</option>`;
-  if(cur&&[...sel.options].some(o=>o.value===cur))sel.value=cur;else if(!CUSTOMERS.length)sel.value='__new';
-  $('s-new').classList.toggle('hide',sel.value!=='__new');
-  renderContacts();renderTracker();
+/* ---------- send: contacts, search, pick, import, whatsapp ---------- */
+let CONTACTS=[];            // {id,customer_id,company,country,name,phone,email,status,location}
+let PICKED=[];              // [{contact_id|null, customer_id, company, name, phone, email, status, depts:[]}]
+const norm=v=>String(v||'').replace(/\s+/g,' ').trim();
+const nkey=v=>norm(v).toLowerCase();
+function deptsFromStatus(st){
+  const s=String(st||'').toUpperCase();const d=new Set();
+  if(/QA|QUALITY|QC|INSPECT/.test(s))d.add('D');
+  if(/TECH|CAD|DESIGN|PRODUCT|PD\b|SAMPL/.test(s))d.add('C');
+  if(/MERCH|BUYER|\bMM\b|SMR|LOGISTIC|SOURC/.test(s))d.add('B');
+  if(/OWNER|DIRECTOR|PROPRIETOR|\bMD\b|CEO|PARTNER/.test(s))d.add('A');
+  if(!d.size&&/HEAD|MANAGER/.test(s))d.add('A');
+  return [...d].sort();
 }
-function renderContacts(){
-  $('contacts').innerHTML=contactRows.map((r,i)=>`
-   <div class="contact-row"><input placeholder="Contact name" value="${esc(r.name)}" data-f="name" data-i="${i}"><input placeholder="Email" type="email" value="${esc(r.email)}" data-f="email" data-i="${i}">
-   <div class="depts">${DEPTS.map(d=>`<label><input type="checkbox" data-d="${d}" data-i="${i}" ${r.depts.includes(d)?'checked':''}>${SEC[d].name}</label>`).join('')}</div>
-   <button class="x" data-rm="${i}" title="Remove" type="button">×</button></div>`).join('');
-  document.querySelectorAll('[data-f]').forEach(el=>el.oninput=()=>contactRows[+el.dataset.i][el.dataset.f]=el.value);
-  document.querySelectorAll('[data-d]').forEach(el=>el.onchange=()=>{const r=contactRows[+el.dataset.i];r.depts=el.checked?[...r.depts,el.dataset.d]:r.depts.filter(x=>x!==el.dataset.d)});
-  document.querySelectorAll('[data-rm]').forEach(el=>el.onclick=()=>{contactRows.splice(+el.dataset.rm,1);if(!contactRows.length)contactRows.push({name:'',email:'',depts:[]});renderContacts()});
+function waNumber(p){
+  let d=String(p||'').split(/[,/]/)[0].replace(/\D/g,'');
+  if(!d)return '';
+  if(d.length===10)return '91'+d;
+  if(d.length===11&&d.startsWith('0'))return '91'+d.slice(1);
+  return d;
 }
-$('add-contact').onclick=()=>{contactRows.push({name:'',email:'',depts:[]});renderContacts()};
-$('s-cust').onchange=()=>$('s-new').classList.toggle('hide',$('s-cust').value!=='__new');
-$('gen').onclick=async()=>{
-  const b=$('gen');let customer_id=$('s-cust').value;
-  const valid=contactRows.filter(r=>r.name.trim()&&r.depts.length);
-  if(!valid.length)return toast('Add at least one contact with a name and a department');
-  b.disabled=true;
-  if(customer_id==='__new'){
-    const company=$('s-company').value.trim(),country=$('s-country').value.trim();
-    if(!company){b.disabled=false;return toast('Enter the company name first')}
-    const {data,error}=await sb.from('customers').upsert({company,country},{onConflict:'company'}).select().single();
-    if(error){b.disabled=false;return toast('Could not save customer: '+error.message)}
-    customer_id=data.id;
-  }
-  const rows=valid.map(r=>({customer_id,contact:r.name.trim(),email:r.email.trim(),depts:[...r.depts].sort()}));
+function waUrl(l){
+  const text=encodeURIComponent(`Dear ${l.contact.split(' ')[0]},\n\nThank you for your continued partnership with U&M Designs. I would value your candid feedback on your recent work with our ${deptNames(l.depts)} team — it takes about three minutes and comes directly to me.\n\n${linkUrl(l)}\n\nYour reply is confidential and reviewed by me personally.\n\nWarm regards,\nManaging Director, U&M Designs`);
+  const n=waNumber(l.phone);
+  return n?`https://wa.me/${n}?text=${text}`:`https://wa.me/?text=${text}`;
+}
+async function loadContacts(){
+  const {data,error}=await sb.from('contacts').select('*').order('name');
+  if(error){toast('Could not load contacts: '+error.message);return}
+  const byId=Object.fromEntries(CUSTOMERS.map(c=>[c.id,c]));
+  CONTACTS=data.map(r=>({...r,company:byId[r.customer_id]?.company||'',country:byId[r.customer_id]?.country||''}));
+}
+function renderSend(){renderResults();renderPicked();renderAdder();renderDupes();renderTracker()}
+
+/* search */
+$('q').oninput=renderResults;
+function renderResults(){
+  const q=nkey($('q').value);const terms=q.split(' ').filter(Boolean);
+  const hay=c=>nkey([c.name,c.company,c.phone,c.email,c.status,c.location].join(' '));
+  let list=CONTACTS;
+  if(terms.length)list=CONTACTS.filter(c=>{const h=hay(c);return terms.every(t=>h.includes(t))});
+  // customers with no contacts still appear when their name matches
+  const custHits=CUSTOMERS.filter(c=>!CONTACTS.some(x=>x.customer_id===c.id)&&(!terms.length||terms.every(t=>nkey(c.company).includes(t))));
+  if(!list.length&&!custHits.length){$('results').innerHTML=`<div class="empty-sm">${CONTACTS.length?'No contact matches. Try fewer words, or add the contact by hand below.':'No contacts yet — import the Excel list or add one by hand.'}</div>`;return}
+  const groups=new Map();
+  list.forEach(c=>{if(!groups.has(c.customer_id))groups.set(c.customer_id,{company:c.company,rows:[]});groups.get(c.customer_id).rows.push(c)});
+  custHits.forEach(c=>groups.set(c.id,{company:c.company,rows:[]}));
+  const ordered=[...groups.entries()].sort((a,b)=>a[1].company.localeCompare(b[1].company)).slice(0,40);
+  $('results').innerHTML=ordered.map(([cid,g])=>`
+    <div class="res-co"><span>${esc(g.company)}</span>${g.rows.length>1?`<button class="add-all" data-addall="${cid}" type="button">Add all ${g.rows.length}</button>`:''}</div>
+    ${g.rows.map(c=>{const inn=PICKED.some(p=>p.contact_id===c.id);const d=deptsFromStatus(c.status);return`
+    <div class="res-row ${inn?'in':''}" data-pick="${c.id}"><input type="checkbox" ${inn?'checked':''} tabindex="-1"><div><b>${esc(c.name)}</b><small>${esc([c.phone,c.email,c.location].filter(Boolean).join(' · ')||'no phone / email')}</small></div><span class="tag ${d.length?'':'none'}">${esc(c.status||'role not set')}</span></div>`}).join('')||'<div class="empty-sm">No contacts listed for this company yet.</div>'}`).join('');
+  document.querySelectorAll('[data-pick]').forEach(el=>el.onclick=()=>togglePick(el.dataset.pick));
+  document.querySelectorAll('[data-addall]').forEach(el=>el.onclick=e=>{e.stopPropagation();CONTACTS.filter(c=>c.customer_id===el.dataset.addall).forEach(c=>{if(!PICKED.some(p=>p.contact_id===c.id))togglePick(c.id,true)})});
+}
+function togglePick(id,addOnly){
+  const i=PICKED.findIndex(p=>p.contact_id===id);
+  if(i>=0&&!addOnly){PICKED.splice(i,1)}
+  else if(i<0){const c=CONTACTS.find(x=>x.id===id);PICKED.push({contact_id:c.id,customer_id:c.customer_id,company:c.company,name:c.name,phone:c.phone,email:c.email,status:c.status,depts:deptsFromStatus(c.status)})}
+  renderResults();renderPicked();
+}
+function renderPicked(){
+  if(!PICKED.length){$('picked').innerHTML='';return}
+  const noDept=PICKED.filter(p=>!p.depts.length).length;
+  $('picked').innerHTML=`<h4>Ready to send — ${PICKED.length} contact${PICKED.length>1?'s':''}<small>${noDept?noDept+' still need a department':'departments set from their role; adjust if needed'}</small></h4>
+   ${PICKED.map((p,i)=>`<div class="pick-row"><div class="who"><b>${esc(p.name)}</b><small>${esc(p.company)}${p.status?' · '+esc(p.status):''}</small></div><button class="x" data-unpick="${i}" type="button" title="Remove">×</button>
+     <input placeholder="Phone (WhatsApp)" value="${esc(p.phone)}" data-pf="phone" data-i="${i}"><input placeholder="Email" value="${esc(p.email)}" data-pf="email" data-i="${i}"><span></span>
+     <div class="depts">${DEPTS.map(d=>`<label><input type="checkbox" data-pd="${d}" data-i="${i}" ${p.depts.includes(d)?'checked':''}>${SEC[d].name}</label>`).join('')}</div></div>`).join('')}
+   <div style="margin-top:16px;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button class="btn primary" id="gen" type="button">Generate ${PICKED.length} link${PICKED.length>1?'s':''}</button><button class="btn ghost sm" id="clear-picked" type="button">Clear</button></div>`;
+  document.querySelectorAll('[data-unpick]').forEach(el=>el.onclick=()=>{PICKED.splice(+el.dataset.unpick,1);renderResults();renderPicked()});
+  document.querySelectorAll('[data-pf]').forEach(el=>el.oninput=()=>PICKED[+el.dataset.i][el.dataset.pf]=el.value);
+  document.querySelectorAll('[data-pd]').forEach(el=>el.onchange=()=>{const p=PICKED[+el.dataset.i];p.depts=el.checked?[...p.depts,el.dataset.pd].sort():p.depts.filter(x=>x!==el.dataset.pd)});
+  $('clear-picked').onclick=()=>{PICKED=[];renderResults();renderPicked()};
+  $('gen').onclick=generateLinks;
+}
+async function generateLinks(){
+  const missing=PICKED.filter(p=>!p.depts.length);
+  if(missing.length)return toast(`Choose a department for ${missing[0].name}`);
+  const b=$('gen');b.disabled=true;
+  // keep the contact record in step with any phone/email typed here
+  for(const p of PICKED){if(p.contact_id){await sb.from('contacts').update({phone:norm(p.phone),email:norm(p.email)}).eq('id',p.contact_id)}}
+  const rows=PICKED.map(p=>({customer_id:p.customer_id,contact_id:p.contact_id,contact:p.name,email:norm(p.email),phone:norm(p.phone),depts:p.depts}));
   const {error}=await sb.from('links').insert(rows);
   b.disabled=false;
   if(error)return toast('Could not create links: '+error.message);
-  contactRows=[{name:'',email:'',depts:[]}];$('s-company').value='';$('s-country').value='';
-  await loadAll();$('s-cust').value=customer_id;$('s-new').classList.add('hide');
-  toast(`${rows.length} link${rows.length>1?'s':''} created — ready to send`);
+  const n=rows.length;PICKED=[];$('q').value='';
+  await loadAll();toast(`${n} link${n>1?'s':''} created — ready to send`);
+}
+
+/* add by hand */
+function renderAdder(){
+  const sel=$('a-cust');const cur=sel.value;
+  sel.innerHTML=CUSTOMERS.map(c=>`<option value="${esc(c.id)}">${esc(c.company)}</option>`).join('')+'<option value="__new">+ New company…</option>';
+  if(cur&&[...sel.options].some(o=>o.value===cur))sel.value=cur;
+  $('a-company').classList.toggle('hide',sel.value!=='__new');
+}
+$('a-cust').onchange=()=>$('a-company').classList.toggle('hide',$('a-cust').value!=='__new');
+$('a-save').onclick=async()=>{
+  let customer_id=$('a-cust').value;const name=norm($('a-name').value);
+  if(!name)return toast('Enter the contact name');
+  if(customer_id==='__new'){const company=norm($('a-company').value);if(!company)return toast('Enter the company name');
+    const {data,error}=await sb.from('customers').upsert({company,country:''},{onConflict:'company'}).select().single();if(error)return toast(error.message);customer_id=data.id}
+  const row={customer_id,name,phone:norm($('a-phone').value),email:norm($('a-email').value),status:norm($('a-status').value).toUpperCase(),location:norm($('a-location').value)};
+  const {data,error}=await sb.from('contacts').upsert(row,{onConflict:'customer_id,name_key'}).select().single();
+  if(error)return toast('Could not save: '+error.message);
+  ['a-name','a-phone','a-email','a-status','a-location','a-company'].forEach(id=>$(id).value='');
+  await loadAll();togglePick(data.id,true);toast('Contact saved and added to the list');
 };
+
+/* import from Excel / CSV */
+$('import-btn').onclick=()=>$('import-file').click();
+$('import-file').onchange=async e=>{
+  const f=e.target.files[0];if(!f)return;e.target.value='';
+  toast('Reading file…');
+  if(!window.XLSX){await new Promise((res,rej)=>{const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';sc.onload=res;sc.onerror=rej;document.head.appendChild(sc)}).catch(()=>toast('Could not load the spreadsheet reader — check your connection'))}
+  const buf=await f.arrayBuffer();const wb=XLSX.read(buf,{type:'array'});const ws=wb.Sheets[wb.SheetNames[0]];
+  const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''}).map(r=>r.map(v=>norm(v)));
+  const hi=rows.findIndex(r=>r.some(v=>/name/i.test(v))&&r.some(v=>/company/i.test(v)));
+  if(hi<0)return toast('Could not find a header row with "Name" and "Company Name"');
+  const H=rows[hi].map(h=>h.toLowerCase());
+  const col=re=>H.findIndex(h=>re.test(h));
+  const ci={name:col(/^name/),company:col(/company/),phone:col(/contact|phone|mobile|whatsapp/),email:col(/mail/),status:col(/status|role|dept/),location:col(/location|city/)};
+  const recs=rows.slice(hi+1).map(r=>({name:r[ci.name]||'',company:r[ci.company]||'',phone:ci.phone>=0?r[ci.phone].replace(/[^\d,+\s/]/g,'').trim():'',email:ci.email>=0?r[ci.email]:'',status:ci.status>=0?r[ci.status].toUpperCase():'',location:ci.location>=0?r[ci.location]:''})).filter(r=>r.name&&r.company);
+  // plan: group by company (case-insensitive), dedupe within company by name or first phone
+  const byCo=new Map();
+  recs.forEach(r=>{const k=nkey(r.company);if(!byCo.has(k))byCo.set(k,{company:r.company,rows:[]});const g=byCo.get(k);
+    const pk=r.phone.split(/[,/]/)[0].replace(/\D/g,'').slice(-10);
+    const hit=g.rows.find(x=>nkey(x.name)===nkey(r.name)||(pk&&x.phone.replace(/\D/g,'').slice(-10)===pk));
+    if(hit){hit.phone=hit.phone||r.phone;hit.email=hit.email||r.email;hit.status=hit.status||r.status;hit.location=hit.location||r.location}else g.rows.push(r)});
+  const existingCo=new Map(CUSTOMERS.map(c=>[nkey(c.company),c]));
+  let newCo=0,newCt=0,updCt=0;
+  byCo.forEach((g,k)=>{const c=existingCo.get(k);if(!c)newCo++;g.rows.forEach(r=>{const ex=c&&CONTACTS.find(x=>x.customer_id===c.id&&nkey(x.name)===nkey(r.name));ex?updCt++:newCt++})});
+  const ok=await modal(`Import ${recs.length} rows?`,`From <b>${esc(f.name)}</b>. Existing contacts are updated only where a field was blank; nothing is deleted.`,
+    [['Companies in file',byCo.size],['New companies',newCo],['New contacts',newCt],['Existing contacts (will be refreshed)',updCt]],'Import');
+  if(!ok)return;
+  toast('Importing…');
+  for(const [k,g] of byCo){
+    let c=existingCo.get(k);
+    if(!c){const {data,error}=await sb.from('customers').insert({company:g.company,country:''}).select().single();if(error){toast('Stopped: '+error.message);return}c=data;existingCo.set(k,c)}
+    const payload=g.rows.map(r=>({customer_id:c.id,name:r.name,phone:r.phone,email:r.email,status:r.status,location:r.location}));
+    const {error}=await sb.from('contacts').upsert(payload,{onConflict:'customer_id,name_key',ignoreDuplicates:false});
+    if(error){toast('Stopped at '+g.company+': '+error.message);return}
+  }
+  await loadAll();toast(`Imported: ${newCo} new companies, ${newCt} new contacts`);
+};
+function modal(title,sub,rows,okLabel){
+  return new Promise(res=>{
+    const bg=document.createElement('div');bg.className='modal-bg';
+    bg.innerHTML=`<div class="modal"><h3>${title}</h3><p class="sub">${sub}</p><table>${rows.map(([k,v])=>`<tr><td>${k}</td><td>${v}</td></tr>`).join('')}</table><div class="acts"><button class="btn ghost sm" id="m-no" type="button">Cancel</button><button class="btn primary sm" id="m-ok" type="button">${okLabel}</button></div></div>`;
+    document.body.appendChild(bg);
+    bg.querySelector('#m-no').onclick=()=>{bg.remove();res(false)};bg.querySelector('#m-ok').onclick=()=>{bg.remove();res(true)};
+  });
+}
+
+/* possible duplicate customers → merge */
+function renderDupes(){
+  const pairs=[];const cs=CUSTOMERS;
+  for(let i=0;i<cs.length;i++)for(let j=i+1;j<cs.length;j++){
+    const a=nkey(cs[i].company),b=nkey(cs[j].company);const fa=a.split(' ')[0],fb=b.split(' ')[0];
+    if(a!==b&&((fa===fb&&fa.length>=4)||a.includes(b)||b.includes(a)))pairs.push([cs[i],cs[j]]);
+  }
+  if(!pairs.length){$('dupes').innerHTML='';return}
+  $('dupes').innerHTML=`<div class="dupes"><b>Possible duplicate companies</b>${pairs.slice(0,8).map(([a,b])=>`<div class="d"><span>${esc(a.company)} &nbsp;↔&nbsp; ${esc(b.company)}</span><span style="display:flex;gap:4px"><button class="btn ghost sm" data-merge="${a.id}|${b.id}" type="button">Keep "${esc(b.company)}"</button><button class="btn ghost sm" data-merge="${b.id}|${a.id}" type="button">Keep "${esc(a.company)}"</button></span></div>`).join('')}</div>`;
+  document.querySelectorAll('[data-merge]').forEach(el=>el.onclick=async()=>{const [src,tgt]=el.dataset.merge.split('|');const s=CUSTOMERS.find(c=>c.id===src),t=CUSTOMERS.find(c=>c.id===tgt);
+    if(!confirm(`Move everything from "${s.company}" into "${t.company}" and remove "${s.company}"?`))return;
+    const {error}=await sb.rpc('merge_customers',{p_source:src,p_target:tgt});if(error)return toast(error.message);await loadAll();toast('Merged')});
+}
+
+/* tracker */
 function mailto(l){
   const subj=encodeURIComponent('A quick word on your experience with U&M Designs');
   const body=encodeURIComponent(`Dear ${l.contact.split(' ')[0]},\n\nThank you for your continued partnership with U&M Designs. I would value your candid feedback on your recent work with our ${deptNames(l.depts)} team. It takes about three minutes and comes directly to me.\n\n${linkUrl(l)}\n\nYour reply is confidential and reviewed by me personally.\n\nWarm regards,\nManaging Director\nU&M Designs`);
   return `mailto:${encodeURIComponent(l.email)}?subject=${subj}&body=${body}`;
 }
 function renderTracker(){
-  if(!LINKS.length){$('tracker').innerHTML='<p class="empty">No links yet. Create the first ones on the left.</p>';return}
+  if(!LINKS.length){$('tracker').innerHTML='<p class="empty">No links yet. Pick contacts on the left to create the first ones.</p>';return}
   const byC=new Map();LINKS.forEach(l=>{if(!byC.has(l.company))byC.set(l.company,[]);byC.get(l.company).push(l)});
   $('tracker').innerHTML=[...byC.entries()].map(([company,ls])=>`
    <div class="tracker-cust"><h4>${esc(company)}<small>${ls.filter(l=>l.answered).length} of ${ls.length} answered</small></h4>
-   ${ls.map(l=>`<div class="link-row"><div><b>${esc(l.contact)}</b><small>${esc(l.email||'no email')} · ${esc(deptNames(l.depts))} + Overall</small></div>
+   ${ls.map(l=>`<div class="link-row"><div><b>${esc(l.contact)}</b><small>${esc([l.phone,l.email].filter(Boolean).join(' · ')||'no phone / email')} · ${esc(deptNames(l.depts))} + Overall</small></div>
     <span class="status ${l.answered?'s-answered':l.opened?'s-opened':'s-sent'}">${l.answered?'Answered':l.opened?'Opened '+fmtDate(l.opened):'Created '+fmtDate(l.sent)}</span>
     <code title="${esc(linkUrl(l))}">${esc(linkUrl(l))}</code>
-    <div class="acts">${l.answered?'':`<button class="btn ghost sm" data-copy="${l.id}" type="button">Copy link</button><a class="btn ghost sm" href="${mailto(l)}">Email</a><a class="btn ghost sm" href="${linkUrl(l)}" target="_blank" rel="noopener">Preview</a><button class="btn sm danger" data-del="${l.id}" type="button">Remove</button>`}</div></div>`).join('')}</div>`).join('');
+    <div class="acts">${l.answered?'':`<a class="btn wa sm" href="${waUrl(l)}" target="_blank" rel="noopener">WhatsApp${waNumber(l.phone)?'':' (choose contact)'}</a><a class="btn ghost sm" href="${mailto(l)}">Email</a><button class="btn ghost sm" data-copy="${l.id}" type="button">Copy link</button><a class="btn ghost sm" href="${linkUrl(l)}" target="_blank" rel="noopener">Preview</a><button class="btn sm danger" data-del="${l.id}" type="button">Remove</button>`}</div></div>`).join('')}</div>`).join('');
   document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=async()=>{const l=LINKS.find(x=>x.id===b.dataset.copy);try{await navigator.clipboard.writeText(linkUrl(l));toast('Link copied')}catch(e){prompt('Copy this link:',linkUrl(l))}});
   document.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{const l=LINKS.find(x=>x.id===b.dataset.del);if(!confirm(`Remove the link for ${l.contact}? It will stop working.`))return;const {error}=await sb.from('links').delete().eq('id',l.id);if(error)return toast(error.message);loadAll()});
 }
