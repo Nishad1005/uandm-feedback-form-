@@ -22,8 +22,9 @@ alter table contacts enable row level security;
 drop policy if exists staff_all on contacts;
 create policy staff_all on contacts for all to authenticated using (true) with check (true);
 
--- dashboard view now carries phone + contact_id
-create or replace view link_overview as
+-- dashboard view now carries phone + contact_id (drop first: Postgres cannot insert columns into an existing view)
+drop view if exists link_overview;
+create view link_overview as
   select l.id, l.code, l.contact, l.email, l.phone, l.contact_id, l.depts, l.created_at, l.opened_at, l.answered_at,
          c.id as customer_id, c.company, c.country,
          r.ratings, r.remarks, r.open_answers, r.submitted_at
