@@ -35,6 +35,11 @@ const OPEN=[['f1','What is the ONE thing U&M Designs should improve immediately 
 const SEC=Object.fromEntries(SECTIONS.map(s=>[s.id,s]));
 const DEPTS=['A','B','C','D'];
 const SCALE_LABELS={1:'Poor',2:'Needs work',3:'Satisfactory',4:'Very good',5:'Excellent'};
+/* questions whose faces carry their own wording (still stored as 1–5) */
+const LABELS_BY_Q={
+ 23:{1:'Not at all recommend',2:'Might not recommend',3:'Might or might not recommend',4:'Will recommend',5:'Will definitely recommend'}
+};
+const labelFor=(q,v)=>(LABELS_BY_Q[q]&&LABELS_BY_Q[q][v])||SCALE_LABELS[v];
 /* five faces, drawn inline so they render identically on every device; each still stores 1–5 */
 const FACE={
  1:'<path class="f-ln" d="M15 30 Q22 22 29 30"/><circle class="f-dot" cx="16.5" cy="17" r="2"/><circle class="f-dot" cx="27.5" cy="17" r="2"/><path class="f-ln" d="M13 13 l4 2 M31 13 l-4 2"/>',

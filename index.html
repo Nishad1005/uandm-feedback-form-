@@ -20,6 +20,8 @@
 .btn.busy{opacity:.6;pointer-events:none}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;opacity:0;transition:.25s;pointer-events:none;box-shadow:var(--shadow);z-index:30}
 .toast.show{opacity:1;transform:translateX(-50%)}
+.q.long-labels .face .fl{font-size:11px;line-height:1.15}
+@media(max-width:420px){.q.long-labels .face .fl{font-size:10px}.q.long-labels .face{padding:8px 2px 6px}}
 </style>
 </head>
 <body>
@@ -88,10 +90,10 @@ function renderStep(){
           ${OPEN.slice(1).map(([k,t])=>`<div class="open"><label for="${k}">${t}</label><textarea id="${k}" data-open="${k}" placeholder="Your thoughts, if you'd like to share…">${esc(draft.open[k]||'')}</textarea></div>`).join('')}
         </details>`
       :sec.qs.map(([n,text],idx)=>`
-        <div style="--q-index:${idx}" class="q ${draft.ratings[n]!==undefined?'done':''} ${draft.ratings[n]==='NA'?'na-picked':''}" data-q="${n}">
+        <div style="--q-index:${idx}" class="q ${draft.ratings[n]!==undefined?'done':''} ${draft.ratings[n]==='NA'?'na-picked':''} ${LABELS_BY_Q[n]?'long-labels':''}" data-q="${n}">
           <div class="q-head"><span class="q-no">${draft.ratings[n]!==undefined&&draft.ratings[n]!=='NA'?'✓':String(idx+1).padStart(2,'0')}</span><span class="q-text" id="question-${n}">${text}</span></div>
           <div class="scale" role="group" aria-labelledby="question-${n}">
-            ${[1,2,3,4,5].map(v=>`<button type="button" class="face ${draft.ratings[n]===v?'pick':''}" data-rate="${v}" aria-label="${SCALE_LABELS[v]}" aria-pressed="${draft.ratings[n]===v}" title="${SCALE_LABELS[v]}">${faceSvg(v)}<span class="fl">${SCALE_LABELS[v]}</span></button>`).join('')}
+            ${[1,2,3,4,5].map(v=>`<button type="button" class="face ${draft.ratings[n]===v?'pick':''}" data-rate="${v}" aria-label="${labelFor(n,v)}" aria-pressed="${draft.ratings[n]===v}" title="${labelFor(n,v)}">${faceSvg(v)}<span class="fl">${labelFor(n,v)}</span></button>`).join('')}
           </div><div class="na-row"><button type="button" class="${draft.ratings[n]==='NA'?'pick':''}" data-rate="NA" aria-pressed="${draft.ratings[n]==='NA'}">Doesn't apply to me</button></div>
           <details class="remark" ${draft.remarks[n]?'open':''}><summary>Add context to your rating <span style="color:#898a89;font-weight:400">(optional)</span></summary><textarea data-remark="${n}" placeholder="Anything you'd like us to know?">${esc(draft.remarks[n]||'')}</textarea></details>
         </div>`).join('')}

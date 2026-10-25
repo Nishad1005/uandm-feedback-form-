@@ -359,7 +359,7 @@ function waNumber(p){
   return d;
 }
 function waUrl(l){
-  const text=encodeURIComponent(`Dear ${l.contact.split(' ')[0]},\n\nThank you for your continued partnership with U&M Designs. I would value your candid feedback on your recent work with our ${deptNames(l.depts)} team — it takes about three minutes and comes directly to me.\n\n${linkUrl(l)}\n\nYour reply is confidential and reviewed by me personally.\n\nWarm regards,\nManaging Director, U&M Designs`);
+  const text=encodeURIComponent(`Dear ${l.contact.split(' ')[0]},\n\nThank you for your continued partnership with U&M Designs. I would value your candid feedback on your recent work with our ${deptNames(l.depts)} team — it takes about three minutes and comes directly to me. Please click the link below to continue with the form-\n\n${linkUrl(l)}\n\nYour reply is confidential and reviewed by me personally.\n\nWarm regards,\nFounder,\nU&M Designs`);
   const n=waNumber(l.phone);
   return n?`https://wa.me/${n}?text=${text}`:`https://wa.me/?text=${text}`;
 }
@@ -508,7 +508,7 @@ function renderDupes(){
 /* tracker */
 function mailto(l){
   const subj=encodeURIComponent('A quick word on your experience with U&M Designs');
-  const body=encodeURIComponent(`Dear ${l.contact.split(' ')[0]},\n\nThank you for your continued partnership with U&M Designs. I would value your candid feedback on your recent work with our ${deptNames(l.depts)} team. It takes about three minutes and comes directly to me.\n\n${linkUrl(l)}\n\nYour reply is confidential and reviewed by me personally.\n\nWarm regards,\nManaging Director\nU&M Designs`);
+  const body=encodeURIComponent(`Dear ${l.contact.split(' ')[0]},\n\nThank you for your continued partnership with U&M Designs. I would value your candid feedback on your recent work with our ${deptNames(l.depts)} team — it takes about three minutes and comes directly to me. Please click the link below to continue with the form-\n\n${linkUrl(l)}\n\nYour reply is confidential and reviewed by me personally.\n\nWarm regards,\nFounder,\nU&M Designs`);
   return `mailto:${encodeURIComponent(l.email)}?subject=${subj}&body=${body}`;
 }
 let OPEN_CO=new Set();
