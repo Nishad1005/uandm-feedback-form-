@@ -6,11 +6,11 @@
 <meta name="theme-color" content="#F4EDE6">
 <meta name="robots" content="noindex,nofollow">
 <title>Feedback Scorecard · U&M Designs</title>
-<link rel="icon" href="/logo.png" type="image/png">
+<link rel="icon" href="/feedback/logo.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/app.css">
+<link rel="stylesheet" href="/feedback/app.css">
 <style>
 /* admin-only additions on top of the shared identity */
 .topbar{position:sticky;top:0;animation:none}
@@ -134,7 +134,7 @@ details.adder summary{cursor:pointer;font-weight:600;font-size:14px;color:var(--
 </head>
 <body>
 <header class="topbar">
-  <div class="brand"><img class="brand-logo" src="/logo.png" alt="U&M Designs"><span class="brand-divider"></span><span class="brand-context">FEEDBACK SCORECARD</span></div>
+  <div class="brand"><img class="brand-logo" src="/feedback/logo.png" alt="U&M Designs"><span class="brand-divider"></span><span class="brand-context">FEEDBACK SCORECARD</span></div>
   <div class="header-user hide" id="hdr-user"><span id="who"></span><button id="signout" type="button">Sign out</button></div>
 </header>
 
@@ -227,8 +227,8 @@ details.adder summary{cursor:pointer;font-weight:600;font-size:14px;color:var(--
   </div>
 </section>
 
-<script src="/config.js"></script>
-<script src="/questionnaire.js"></script>
+<script src="/feedback/config.js"></script>
+<script src="/feedback/questionnaire.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 const sb=window.supabase.createClient(UM_CONFIG.SUPABASE_URL,UM_CONFIG.SUPABASE_ANON_KEY);
@@ -274,7 +274,7 @@ const custOverall=company=>avg(SECTIONS.map(s=>custSection(company,s.id)).filter
 const custCoverage=company=>DEPTS.filter(d=>custSection(company,d)!==null);
 const companySection=secId=>avg(CUSTOMERS.map(c=>custSection(c.company,secId)).filter(v=>v!==null));
 function questionAvg(n){const v=RESPONSES.map(r=>r.ratings[n]).filter(x=>typeof x==='number');return v.length?avg(v)/5*100:null}
-const linkUrl=l=>`${UM_CONFIG.SITE_URL}/?code=${l.code}`;
+const linkUrl=l=>`${UM_CONFIG.SITE_URL}/feedback?code=${l.code}`;
 
 /* ---------- render ---------- */
 let selected=null;
